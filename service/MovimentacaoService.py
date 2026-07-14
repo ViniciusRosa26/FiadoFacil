@@ -15,19 +15,11 @@ class MovimentacaoService:
         return datetime.now().strftime("%d/%m/%y %H:%M")
 
     def listar_por_cliente(self, cliente_id):
-        print(f"\n--- EXTRATO DO CLIENTE {cliente_id} ---")
-        movimentacoes = self.repository.buscar_por_cliente(cliente_id)
-        for m in movimentacoes:
-            descricao = f" - {m.descricao}" if m.descricao else ""
-            print(
-                f"Data: {m.data_hora} | Tipo: {m.tipo} | Valor: R${m.valor:.2f}{descricao}"
-            )
-        return movimentacoes
+        return self.repository.buscar_por_cliente(cliente_id)
 
     def criar_movimentacao_divida(self, cliente: ClienteModel, valor: float):
         if valor <= 0:
-            print("O valor da dívida deve ser maior que zero.")
-            return None
+            raise ValueError("O valor da dívida deve ser maior que zero.")
 
         data_movimentacao = self._gerar_data_formatada()
         cliente.saldo_devedor += valor
@@ -42,15 +34,11 @@ class MovimentacaoService:
         )
 
         self.repository.salvar(nova_movi)
-        print(
-            f"Dívida de R${valor:.2f} adicionada. Novo saldo devedor: R${cliente.saldo_devedor:.2f}."
-        )
         return nova_movi
 
     def abater_total_saldo(self, cliente: ClienteModel):
         if cliente.saldo_devedor <= 0:
-            print(f"O cliente {cliente.apelido} não possui nenhuma dívida ativa para abater.")
-            return None
+            raise ValueError(f"O cliente {cliente.apelido} não possui dívida ativa para abater.")
 
         valor_abatido = cliente.saldo_devedor
         data_movimentacao = self._gerar_data_formatada()
@@ -66,22 +54,17 @@ class MovimentacaoService:
         )
 
         self.repository.salvar(nova_movi)
-        print(
-            f"Sucesso! Toda a dívida de R${valor_abatido:.2f} foi quitada em {data_movimentacao}."
-        )
         return nova_movi
 
     def abater_parcial_saldo(self, cliente: ClienteModel, valor_pagamento: float):
         if valor_pagamento <= 0:
-            print("O valor do pagamento deve ser maior que zero.")
-            return None
+            raise ValueError("O valor do pagamento deve ser maior que zero.")
 
         if valor_pagamento > cliente.saldo_devedor:
-            print(
-                f"Aviso: O valor informado (R${valor_pagamento:.2f}) é maior que a dívida atual "
+            raise ValueError(
+                f"O valor informado (R${valor_pagamento:.2f}) é maior que a dívida atual "
                 f"(R${cliente.saldo_devedor:.2f})."
             )
-            return None
 
         data_movimentacao = self._gerar_data_formatada()
         cliente.saldo_devedor -= valor_pagamento
@@ -96,8 +79,4 @@ class MovimentacaoService:
         )
 
         self.repository.salvar(nova_movi)
-        print(
-            f"Pagamento de R${valor_pagamento:.2f} processado em {data_movimentacao}. "
-            f"Saldo devedor atual: R${cliente.saldo_devedor:.2f}."
-        )
         return nova_movi

@@ -28,7 +28,7 @@ class MovimentacaoService:
         nova_movi = MovimentacaoModel(
             cliente_id=cliente.id,
             valor=valor,
-            tipo=TipoDeMovimentacaoEnum.DEBITO.value,
+            tipo=TipoDeMovimentacaoEnum.VENDA.value,
             data_hora=data_movimentacao,
             descricao="Dívida criada",
         )
@@ -48,7 +48,7 @@ class MovimentacaoService:
         nova_movi = MovimentacaoModel(
             cliente_id=cliente.id,
             valor=valor_abatido,
-            tipo=TipoDeMovimentacaoEnum.CREDITO.value,
+            tipo=TipoDeMovimentacaoEnum.PAGAMENTO.value,
             data_hora=data_movimentacao,
             descricao="Abatimento total",
         )
@@ -73,7 +73,7 @@ class MovimentacaoService:
         nova_movi = MovimentacaoModel(
             cliente_id=cliente.id,
             valor=valor_pagamento,
-            tipo=TipoDeMovimentacaoEnum.CREDITO.value,
+            tipo=TipoDeMovimentacaoEnum.PAGAMENTO.value,
             data_hora=data_movimentacao,
             descricao="Abatimento parcial",
         )

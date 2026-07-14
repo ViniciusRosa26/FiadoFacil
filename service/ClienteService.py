@@ -31,7 +31,13 @@ class ClienteService:
 
     def listar(self):
         return self.repository.buscar_todos()
-
+    
+    def buscar_por_id(self, cliente_id):
+        cliente = self.repository.buscar_por_id(cliente_id)
+        if not cliente:
+            raise ValueError(f"Cliente com id {cliente_id} não encontrado.")
+        return cliente
+    
     def atualizar(self, cliente_id, nome=None, apelido=None):
         cliente = self.repository.buscar_por_id(cliente_id)
         if not cliente:
